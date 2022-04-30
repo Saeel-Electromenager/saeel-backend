@@ -1,6 +1,7 @@
 const express = require("express");
+const path = require("path");
 
-
+const userRoutes = require("./routes/user");
 
 const app = express();
 app.use(express.json());
@@ -12,6 +13,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
   );
+
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
@@ -22,9 +24,11 @@ app.use((req, res, next) => {
 // Les routes
 
 // indiquer que le dossier image est statique à fin de permetre l'acces via URL
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // pour la route /api/auth/
-app.use('/api/auth', userRoutes);
+app.use("/api/auth", userRoutes);
+
+app.use("/test", (req, res) => {});
 
 module.exports = app;
