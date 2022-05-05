@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const verifySecretMessage = require("../middleware/check_secret_key");
+const checkSecretKey = require("../middleware/check_secret_key");
+const auth = require("../middleware/auth");
 
 const userCtrl = require("../controlers/user");
 
-router.post("/signup", userCtrl.signup);
-router.post("/login", userCtrl.login);
-router.post("/modify", userCtrl.modify);
-router.post("/test", verifySecretMessage, (req, res) => {
-  res.status(200).json({ message: "c'est ok!" });
-});
+router.post("/signup", checkSecretKey, userCtrl.signup);
+router.post("/login", checkSecretKey, userCtrl.login);
+router.post("/forget-password", checkSecretKey, userCtrl.forgetPassword);
+router.post("/modify", checkSecretKey, auth, userCtrl.modify);
 
 module.exports = router;

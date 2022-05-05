@@ -29,9 +29,8 @@ try {
 (async () => {
   await sequelize
     .sync({ force: false })
-    .then((res) => console.log("Table crée avec succès"))
+    .then((res) => console.log("Tables created successfully"))
     .catch((err) => console.log(err));
-  // Code here
 })();
 
 module.exports = sequelize;
