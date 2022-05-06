@@ -7,7 +7,17 @@ const userCtrl = require("../controlers/user");
 
 router.post("/signup", checkSecretKey, userCtrl.signup);
 router.post("/login", checkSecretKey, userCtrl.login);
-router.post("/forget-password", checkSecretKey, userCtrl.forgetPassword);
 router.post("/modify", checkSecretKey, auth, userCtrl.modify);
+
+router.post(
+  "/forget-password-setter",
+  checkSecretKey,
+  userCtrl.forgetPasswordSetter
+);
+router.post(
+  "/forget-password-getter",
+  checkSecretKey,
+  userCtrl.forgetPasswordGetter
+);
 
 module.exports = router;

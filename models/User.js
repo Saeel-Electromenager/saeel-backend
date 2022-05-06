@@ -29,7 +29,7 @@ const userSchema = {
     validate: {
       notNull: {
         args: false,
-        msg: "firstname cannot be nul",
+        msg: "Firstname cannot be nul",
       },
     },
   },
@@ -76,7 +76,7 @@ const userSchema = {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
-    isIn: [[0, 1, 2, 3]],
+    isIn: [[0, 1, 2, 3]], // ["Simple user", "Fournisseur", "Modérateur", "Administrator"]
   },
   status: {
     type: DataTypes.BOOLEAN,
@@ -84,6 +84,41 @@ const userSchema = {
     defaultValue: 0,
     isIn: [[0, 1, 2]], // ["Email not confirmed", "Account validated", "Account banned"]
   },
+  confirmEmailCode: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+    set(value) {
+      this.setDataValue(
+        "confirmEmailCode",
+        new Date().getTime() + " # " + value
+      );
+    },
+    get() {
+      const time = this.getDataValue("confirmEmailCode").split(" # ")[0];
+      const code = this.getDataValue("confirmEmailCode").split(" # ")[1];
+      return {
+        time: new Date().getTime() - parseInt(time) < 1200000,
+        code: parseInt(code),
+      };
+    },
+  },
+  resetCode: {
+    type: DataTypes.STRING,
+    defaultValue: null,
+    set(value) {
+      const codeWithTime = value ? new Date().getTime() + " # " + value : null;
+      this.setDataValue("resetCode", codeWithTime);
+    },
+    get() {
+      const time = this.getDataValue("resetCode").split(" # ")[0];
+      const code = this.getDataValue("resetCode").split(" # ")[1];
+      return {
+        time: new Date().getTime() - parseInt(time) < 600000,
+        code: parseInt(code),
+      };
+    },
+  },
 };
+
 const User = sequelize.define("Users", userSchema);
 module.exports = User;
