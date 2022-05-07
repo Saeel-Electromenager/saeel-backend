@@ -146,14 +146,6 @@ exports.forgetPasswordGetter = (req, res, next) => {
     .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
 };
 
-exports.addAdress = (req, res, next) => {
-  // add adress here
-};
-
-exports.modifyAdress = (req, res, next) => {
-  // add adress here
-};
-
-exports.deleteAdress = (req, res, next) => {
-  // add adress here
+exports.getUser = (req, res, next) => {
+  // TODO
 };

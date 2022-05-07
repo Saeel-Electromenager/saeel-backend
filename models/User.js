@@ -68,6 +68,12 @@ const userSchema = {
       this.setDataValue("password", bcrypt.hashSync(value, 10));
     },
   },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue:
+      "https://www.kindpng.com/picc/m/451-4517876_default-profile-hd-png-download.png",
+  },
   birthdate: {
     type: DataTypes.DATEONLY,
     allowNull: false,
@@ -76,13 +82,17 @@ const userSchema = {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
-    isIn: [[0, 1, 2, 3]], // ["Simple user", "Fournisseur", "Modérateur", "Administrator"]
+    validate: {
+      isIn: [[0, 1, 2, 3]], // ["Simple user", "Fournisseur", "Modérateur", "Administrator"]
+    },
   },
   status: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: 0,
-    isIn: [[0, 1, 2]], // ["Email not confirmed", "Account validated", "Account banned"]
+    validate: {
+      isIn: [[0, 1, 2]], // ["Email not confirmed", "Account validated", "Account banned"]
+    },
   },
   confirmEmailCode: {
     type: DataTypes.STRING,
@@ -121,4 +131,5 @@ const userSchema = {
 };
 
 const User = sequelize.define("Users", userSchema);
+// User.sync({ alter: true });
 module.exports = User;

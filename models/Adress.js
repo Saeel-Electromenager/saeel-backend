@@ -19,7 +19,11 @@ const adressSchema = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  city: {
+  daira: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  commune: {
     type: DataTypes.STRING,
     allowNull: false,
   },
