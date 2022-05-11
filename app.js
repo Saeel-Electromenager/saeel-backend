@@ -2,7 +2,10 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 
+const categoryRoutes = require("./routes/category");
 const userRoutes = require("./routes/user");
+const adressRoutes = require("./routes/adress");
+const productRoutes = require("./routes/product");
 
 const app = express();
 app.use(express.json());
@@ -29,13 +32,7 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 // pour la route /api/auth/
 app.use("/api/user", userRoutes);
-app.use("/api/category", userRoutes);
-
-app.get("/api/setCookie", (req, res, next) => {
-  res.setHeader("set-cookie", [
-    "cookie1=value1; SameSite=Lax",
-    "cookie2=value2; SameSite=None; Secure",
-  ]);
-  res.status(200).json({ message: "Succes" });
-});
+app.use("/api/category", categoryRoutes);
+app.use("/api/adress", adressRoutes);
+app.use("/api/product", productRoutes);
 module.exports = app;

@@ -28,7 +28,7 @@ try {
 
 (async () => {
   await sequelize
-    .sync({ force: false })
+    .sync({ force: true })
     .then((res) => console.log("Tables created successfully"))
     .catch((err) => console.log(err));
 })();

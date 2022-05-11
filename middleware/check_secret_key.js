@@ -10,7 +10,6 @@ module.exports = (req, res, next) => {
     const hostname = secretMessage[1] === req.headers.origin;
     const timeDifference = timeNow - parseInt(secretMessage[2]) < 7200000;
     const random6 = secretMessage[3].length === 6;
-
     if (userAgent && hostname && timeDifference && random6) {
       next();
     } else throw "Invalid authentification";

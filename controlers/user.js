@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const Adress = require("../models/Adress");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const nodemailer = require("../configurations/nodemailer");
@@ -29,9 +28,21 @@ exports.signup = (req, res, next) => {
       ],
     }
   )
-    .then(() => res.status(201).json({ message: "Utilisateur créer" }))
+    .then((user) => {
+      const code = Math.floor(100000 + Math.random() * 1000000);
+      nodemailer.confirmeEmail(user.email, code).then((mailResponse) => {
+        if (mailResponse) {
+          user
+            .update({ confirmEmailCode: code })
+            .then(() => res.status(201).json({ message: "Utilisateur créer" }))
+            .catch((error) => res.status(500).json({ error: "Erreur server" }));
+        } else
+          res.status(500).json({ error: "Erreur lors de l'envoi de l'email" });
+      });
+    })
     .catch((error) => {
-      res.status(400).json({ error: error.errors[0].message });
+      console.log(error);
+      res.status(500).json({ error: "Error server" });
     });
 };
 
@@ -146,6 +157,56 @@ exports.forgetPasswordGetter = (req, res, next) => {
     .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
 };
 
+exports.confirmeEmailCreateCode = (req, res, next) => {
+  User.findOne({ where: { idUser: req.auth.idUser } })
+    .then((user) => {
+      if (!user)
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      const code = Math.floor(100000 + Math.random() * 1000000);
+      nodemailer.confirmeEmail(req.body.email, code).then((mailResponse) => {
+        if (mailResponse) {
+          user
+            .update({ status: 0, confirmEmailCode: code })
+            .then(() =>
+              res.status(200).json({ message: "E-mail envoyé avec succès" })
+            )
+            .catch((error) => res.status(500).json({ error: "Erreur server" }));
+        } else res.status(500).json({ error: "Erreur server" });
+      });
+    })
+    .catch((error) => res.status(500).json({ error: error }));
+};
+
+exports.confirmeEmail = (req, res, next) => {
+  User.findOne({ where: { email: req.body.email } })
+    .then((user) => {
+      if (!user)
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+
+      if (
+        user.confirmEmailCode.time &&
+        req.body.code === user.confirmEmailCode.code
+      ) {
+        user
+          .update(
+            { password: 1, confirmEmailCode: null },
+            { fields: ["status", "confirmEmailCode"] }
+          )
+          .then(() =>
+            res.status(200).json({ message: "Validation effectué avec succès" })
+          )
+          .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
+      } else res.status(400).json({ error: "Code de récupération invalide" });
+    })
+    .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
+};
+
 exports.getUser = (req, res, next) => {
-  // TODO
+  User.findOne({ where: { idUser: req.auth.idUser } })
+    .then((user) => {
+      res.status(200).json(user.toJSON());
+    })
+    .catch((error) =>
+      res.status(400).json({ error: "Code de récupération invalide" })
+    );
 };

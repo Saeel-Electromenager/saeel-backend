@@ -11,6 +11,19 @@ router.post("/modify", checkSecretKey, auth, userCtrl.modify);
 router.put("/:idUser", checkSecretKey, auth, userCtrl.getUser);
 
 router.post(
+  "/confirme-email-get-code",
+  checkSecretKey,
+  auth,
+  userCtrl.confirmeEmailCreateCode
+);
+router.post(
+  "/confirme-email-set-code",
+  checkSecretKey,
+  auth,
+  userCtrl.confirmeEmail
+);
+
+router.post(
   "/forget-password-setter",
   checkSecretKey,
   userCtrl.forgetPasswordSetter

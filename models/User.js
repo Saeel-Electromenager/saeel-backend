@@ -87,7 +87,7 @@ const userSchema = {
     },
   },
   status: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
     validate: {
@@ -130,6 +130,5 @@ const userSchema = {
   },
 };
 
-const User = sequelize.define("Users", userSchema);
-// User.sync({ alter: true });
+const User = sequelize.define("User", userSchema);
 module.exports = User;

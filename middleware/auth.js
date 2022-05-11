@@ -5,7 +5,6 @@ const RANDOM_TOKEN_SECRET = process.env.RANDOM_TOKEN_SECRET;
 
 module.exports = (req, res, next) => {
   try {
-    console.log("--------------");
     req.auth = { idUser: req.headers.authorization.split(" ")[0] };
     const token = req.headers.authorization.split(" ")[1];
 

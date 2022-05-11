@@ -18,6 +18,6 @@ const categorySchema = {
   },
 };
 
-const Category = sequelize.define("Categories", categorySchema);
+const Category = sequelize.define("Category", categorySchema);
 
 module.exports = Category;

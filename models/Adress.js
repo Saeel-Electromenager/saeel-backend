@@ -11,7 +11,7 @@ const adressSchema = {
   idUser: {
     type: DataTypes.INTEGER,
     references: {
-      model: "users",
+      model: "Users",
       key: "idUser",
     },
   },
@@ -40,6 +40,9 @@ const adressSchema = {
 const Adress = sequelize.define("Adress", adressSchema);
 
 User.hasMany(Adress, {
+  foreignKey: { name: "idUser", allowNull: false },
+});
+Adress.belongsTo(User, {
   foreignKey: { name: "idUser", allowNull: false },
 });
 
