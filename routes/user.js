@@ -34,4 +34,6 @@ router.post(
   userCtrl.forgetPasswordGetter
 );
 
+router.post("/upgrade", checkSecretKey, auth, userCtrl.upgradeUser);
+
 module.exports = router;

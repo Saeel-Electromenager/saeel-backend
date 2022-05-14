@@ -50,6 +50,7 @@ exports.confirmeEmail = (email, code) => {
           "</strong></p><p>Merci pour votre confiance, Saeel.</p></div>",
       }),
       (error, info) => {
+        error ? console.log(error) : "";
         resolve(!error || !!info);
       }
     );

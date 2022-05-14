@@ -34,10 +34,14 @@ exports.signup = (req, res, next) => {
         if (mailResponse) {
           user
             .update({ confirmEmailCode: code })
-            .then(() => res.status(201).json({ message: "Utilisateur créer" }))
+            .then(() =>
+              res.status(201).json({ message: "Utilisateur créer avec succès" })
+            )
             .catch((error) => res.status(500).json({ error: "Erreur server" }));
         } else
-          res.status(500).json({ error: "Erreur lors de l'envoi de l'email" });
+          res.status(500).json({
+            error: "Utilisateur crée mais l'email n'a pas pu etre envoyé",
+          });
       });
     })
     .catch((error) => {
@@ -209,4 +213,28 @@ exports.getUser = (req, res, next) => {
     .catch((error) =>
       res.status(400).json({ error: "Code de récupération invalide" })
     );
+};
+
+exports.upgradeUser = (req, res, next) => {
+  const newStatus = req.body.newStatus;
+  if (![0, 1, 2].includes(newStatus))
+    return res.status(400).json({ error: "erreur" });
+  User.findOne(req.auth.idUser)
+    .then((admin) => {
+      if (admin && admin.status === 3) {
+        User.findOne({ where: { idUser: req.body.user.idUser } })
+          .then((user) => {
+            user
+              .update({ status: newStatus })
+              .then(() =>
+                res
+                  .status(200)
+                  .json({ message: "Utilisateur modifier avec succès" })
+              )
+              .catch(() => res.status(500).json({ error: "erreur serveur" }));
+          })
+          .catch(() => res.status(500).json({ error: "Error server" }));
+      } else res.status(400).json({ error: "t'es pas un admin ?" });
+    })
+    .catch(() => res.status(500).json({ error: "Error server" }));
 };

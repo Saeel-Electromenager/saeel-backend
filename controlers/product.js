@@ -37,3 +37,7 @@ exports.modifyProduct = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
   // TODO
 };
+
+exports.topSales = (req, res, next) => {};
+
+exports.topRated = (req, res, next) => {};
