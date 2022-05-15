@@ -37,7 +37,9 @@ exports.signup = (req, res, next) => {
             .then(() =>
               res.status(201).json({ message: "Utilisateur créer avec succès" })
             )
-            .catch((error) => res.status(500).json({ error: "Erreur server" }));
+            .catch((error) =>
+              res.status(500).json({ error: "Erreur server2" })
+            );
         } else
           res.status(500).json({
             error: "Utilisateur crée mais l'email n'a pas pu etre envoyé",
@@ -46,7 +48,7 @@ exports.signup = (req, res, next) => {
     })
     .catch((error) => {
       console.log(error);
-      res.status(500).json({ error: "Error server" });
+      res.status(500).json({ error: "Error server1" });
     });
 };
 
@@ -153,7 +155,7 @@ exports.forgetPasswordGetter = (req, res, next) => {
 };
 
 exports.confirmeEmailCreateCode = (req, res, next) => {
-  User.findOne({ where: { idUser: req.auth.idUser } })
+  User.findOne({ where: { email: req.body.email } })
     .then((user) => {
       if (!user)
         return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -173,10 +175,9 @@ exports.confirmeEmailCreateCode = (req, res, next) => {
 };
 
 exports.confirmeEmail = (req, res, next) => {
-  console.log(req.body);
   User.findOne({
     where: {
-      idUser: req.auth.idUser,
+      email: req.body.email,
     },
   })
     .then((user) => {
