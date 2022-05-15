@@ -5,10 +5,11 @@ const auth = require("../middleware/auth");
 
 const userCtrl = require("../controlers/user");
 
+router.get("/", checkSecretKey, auth, userCtrl.getAllUsers);
+router.get("/:idUser", checkSecretKey, auth, userCtrl.getUser);
 router.post("/signup", checkSecretKey, userCtrl.signup);
 router.post("/login", checkSecretKey, userCtrl.login);
 router.post("/modify", checkSecretKey, auth, userCtrl.modify);
-router.put("/:idUser", checkSecretKey, auth, userCtrl.getUser);
 
 router.post(
   "/confirme-email-get-code",
@@ -17,7 +18,7 @@ router.post(
   userCtrl.confirmeEmailCreateCode
 );
 router.post(
-  "/confirme-email-set-code",
+  "/confirme-email-code",
   checkSecretKey,
   auth,
   userCtrl.confirmeEmail

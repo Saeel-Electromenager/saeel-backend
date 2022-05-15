@@ -1,6 +1,5 @@
 const express = require("express");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 
 const categoryRoutes = require("./routes/category");
 const userRoutes = require("./routes/user");
@@ -9,7 +8,6 @@ const productRoutes = require("./routes/product");
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 
 // Le header pour le CORS
 app.use((req, res, next) => {

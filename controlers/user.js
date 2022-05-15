@@ -9,7 +9,7 @@ const RANDOM_TOKEN_SECRET = process.env.RANDOM_TOKEN_SECRET;
 
 exports.signup = (req, res, next) => {
   if (req.body.password.length < 5) {
-    res
+    return res
       .status(400)
       .json({ error: "Password must be between 6 and 20 characters" });
   }
@@ -66,23 +66,14 @@ exports.login = (req, res, next) => {
           if (!valid) {
             return res.status(401).json({ error: "Mot de passe incorrect !" });
           }
-          res.cookie(
-            "token",
-            jwt.sign({ idUser: user.idUser }, RANDOM_TOKEN_SECRET, {
-              expiresIn: "24h",
-            }),
-            {
-              maxAge: 1000 * 60 * 60 * 24,
-              secure: false,
-              sameSite: "none",
-              httpOnly: false,
-            }
-          );
           res.status(200).json({
             idUser: user.idUser,
             token: jwt.sign({ idUser: user.idUser }, RANDOM_TOKEN_SECRET, {
               expiresIn: "24h",
             }),
+            firstname: user.firstname,
+            lastname: user.lastname,
+            status: user.status,
           });
         })
         .catch((error) => res.status(500).json({ error }));
@@ -167,7 +158,7 @@ exports.confirmeEmailCreateCode = (req, res, next) => {
       if (!user)
         return res.status(404).json({ message: "Utilisateur non trouvé" });
       const code = Math.floor(100000 + Math.random() * 1000000);
-      nodemailer.confirmeEmail(req.body.email, code).then((mailResponse) => {
+      nodemailer.confirmeEmail(user.email, code).then((mailResponse) => {
         if (mailResponse) {
           user
             .update({ status: 0, confirmEmailCode: code })
@@ -182,18 +173,24 @@ exports.confirmeEmailCreateCode = (req, res, next) => {
 };
 
 exports.confirmeEmail = (req, res, next) => {
-  User.findOne({ where: { email: req.body.email } })
+  console.log(req.body);
+  User.findOne({
+    where: {
+      idUser: req.auth.idUser,
+    },
+  })
     .then((user) => {
       if (!user)
-        return res.status(404).json({ message: "Utilisateur non trouvé" });
-
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      console.log(user.confirmEmailCode.time);
+      console.log(user.confirmEmailCode.code);
       if (
         user.confirmEmailCode.time &&
-        req.body.code === user.confirmEmailCode.code
+        req.body.code == user.confirmEmailCode.code
       ) {
         user
           .update(
-            { password: 1, confirmEmailCode: null },
+            { status: 1, confirmEmailCode: null },
             { fields: ["status", "confirmEmailCode"] }
           )
           .then(() =>
@@ -202,17 +199,26 @@ exports.confirmeEmail = (req, res, next) => {
           .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
       } else res.status(400).json({ error: "Code de récupération invalide" });
     })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Erreur serveur" });
+    });
+};
+
+exports.getAllUsers = (req, res, next) => {
+  User.findOne()
+    .then((users) => {
+      res.status(200).json(users.toJSON());
+    })
     .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
 };
 
 exports.getUser = (req, res, next) => {
-  User.findOne({ where: { idUser: req.auth.idUser } })
+  User.findOne({ where: { idUser: req.params.id } })
     .then((user) => {
       res.status(200).json(user.toJSON());
     })
-    .catch((error) =>
-      res.status(400).json({ error: "Code de récupération invalide" })
-    );
+    .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
 };
 
 exports.upgradeUser = (req, res, next) => {

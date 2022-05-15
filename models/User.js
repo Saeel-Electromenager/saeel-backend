@@ -98,17 +98,23 @@ const userSchema = {
     type: DataTypes.STRING,
     defaultValue: null,
     set(value) {
-      this.setDataValue(
-        "confirmEmailCode",
-        new Date().getTime() + " # " + value
-      );
+      const code = value ? new Date().getTime() + "#" + value : null;
+      this.setDataValue("confirmEmailCode", code);
     },
     get() {
-      const time = this.getDataValue("confirmEmailCode").split(" # ")[0];
-      const code = this.getDataValue("confirmEmailCode").split(" # ")[1];
+      let time, code;
+      if (!this.getDataValue("confirmEmailCode")) {
+        time = false;
+        code = null;
+      } else {
+        time = this.getDataValue("confirmEmailCode").split("#")[0];
+        code = this.getDataValue("confirmEmailCode").split("#")[1];
+        time = new Date().getTime() - parseInt(time) < 1200000;
+        code = parseInt(code);
+      }
       return {
-        time: new Date().getTime() - parseInt(time) < 1200000,
-        code: parseInt(code),
+        time: time,
+        code: code,
       };
     },
   },

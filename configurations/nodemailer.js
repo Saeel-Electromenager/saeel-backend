@@ -1,10 +1,14 @@
 const nodemailer = require("nodemailer");
 
+require("dotenv").config();
+const SAEEL_EMAIL = process.env.SAEEL_EMAIL;
+const SAEEL_EMAIL_PASSWORD = process.env.SAEEL_EMAIL_PASSWORD;
+
 const transporter = nodemailer.createTransport({
   service: "hotmail",
   auth: {
-    user: "saeel.electromenager@outlook.fr",
-    pass: "72NZMr8%vH@:qH9",
+    user: SAEEL_EMAIL,
+    pass: SAEEL_EMAIL_PASSWORD,
   },
 });
 
