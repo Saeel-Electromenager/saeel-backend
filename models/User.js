@@ -109,7 +109,7 @@ const userSchema = {
       } else {
         time = this.getDataValue("confirmEmailCode").split("#")[0];
         code = this.getDataValue("confirmEmailCode").split("#")[1];
-        time = new Date().getTime() - parseInt(time) < 1200000;
+        time = new Date().getTime() - parseInt(time) < 600000;
         code = parseInt(code);
       }
       return {
@@ -126,11 +126,19 @@ const userSchema = {
       this.setDataValue("resetCode", codeWithTime);
     },
     get() {
-      const time = this.getDataValue("resetCode").split(" # ")[0];
-      const code = this.getDataValue("resetCode").split(" # ")[1];
+      let time, code;
+      if (!this.getDataValue("resetCode")) {
+        time = false;
+        code = null;
+      } else {
+        time = this.getDataValue("resetCode").split("#")[0];
+        code = this.getDataValue("resetCode").split("#")[1];
+        time = new Date().getTime() - parseInt(time) < 600000;
+        code = parseInt(code);
+      }
       return {
-        time: new Date().getTime() - parseInt(time) < 600000,
-        code: parseInt(code),
+        time: time,
+        code: code,
       };
     },
   },

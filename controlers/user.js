@@ -112,7 +112,11 @@ exports.modify = (req, res, next) => {
 };
 
 exports.forgetPasswordSetter = (req, res, next) => {
-  User.findOne({ where: { email: req.body.email } })
+  User.findOne({
+    where: {
+      [Op.or]: [{ email: req.body.login }, { username: req.body.login }],
+    },
+  })
     .then((user) => {
       if (!user)
         return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -132,7 +136,9 @@ exports.forgetPasswordSetter = (req, res, next) => {
 };
 
 exports.forgetPasswordGetter = (req, res, next) => {
-  User.findOne({ where: { email: req.body.email } })
+  User.findOne({
+    [Op.or]: [{ email: req.body.login }, { username: req.body.login }],
+  })
     .then((user) => {
       if (!user)
         return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -155,7 +161,11 @@ exports.forgetPasswordGetter = (req, res, next) => {
 };
 
 exports.confirmeEmailCreateCode = (req, res, next) => {
-  User.findOne({ where: { email: req.body.email } })
+  User.findOne({
+    where: {
+      [Op.or]: [{ email: req.body.login }, { username: req.body.login }],
+    },
+  })
     .then((user) => {
       if (!user)
         return res.status(404).json({ message: "Utilisateur non trouvé" });
@@ -177,14 +187,12 @@ exports.confirmeEmailCreateCode = (req, res, next) => {
 exports.confirmeEmail = (req, res, next) => {
   User.findOne({
     where: {
-      email: req.body.email,
+      [Op.or]: [{ email: req.body.login }, { username: req.body.login }],
     },
   })
     .then((user) => {
       if (!user)
         return res.status(404).json({ error: "Utilisateur non trouvé" });
-      console.log(user.confirmEmailCode.time);
-      console.log(user.confirmEmailCode.code);
       if (
         user.confirmEmailCode.time &&
         req.body.code == user.confirmEmailCode.code
@@ -208,18 +216,34 @@ exports.confirmeEmail = (req, res, next) => {
 
 exports.getAllUsers = (req, res, next) => {
   User.findOne()
-    .then((users) => {
-      res.status(200).json(users.toJSON());
+    .then((admin) => {
+      if (admin.type === 3)
+        User.findAll()
+          .then((users) => res.status(200).json(users.toJSON()))
+          .catch(() => res.status(500).json({ error: "Erreur serveur" }));
+      else res.status(401).json({ error: "Vous n'êtes pas autorisé" });
     })
-    .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
+    .catch(() => res.status(500).json({ error: "Erreur serveur" }));
 };
 
 exports.getUser = (req, res, next) => {
-  User.findOne({ where: { idUser: req.params.id } })
+  if (req.params.idUser !== req.auth.idUser)
+    res.status(401).json({ error: "Non autorisé" });
+  User.findOne({
+    where: { idUser: req.params.idUser },
+    include: ["Adresses", "Products"],
+  })
     .then((user) => {
-      res.status(200).json(user.toJSON());
+      user = user.toJSON();
+      delete user.password;
+      delete confirmEmailCode;
+      delete resetCode;
+      res.status(200).json(user);
     })
-    .catch((error) => res.status(500).json({ error: "Erreur serveur" }));
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "error server" });
+    });
 };
 
 exports.upgradeUser = (req, res, next) => {

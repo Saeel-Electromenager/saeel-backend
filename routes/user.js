@@ -6,7 +6,7 @@ const auth = require("../middleware/auth");
 const userCtrl = require("../controlers/user");
 
 router.get("/", checkSecretKey, auth, userCtrl.getAllUsers);
-router.get("/:idUser", checkSecretKey, auth, userCtrl.getUser);
+router.put("/:idUser", checkSecretKey, auth, userCtrl.getUser);
 router.post("/signup", checkSecretKey, userCtrl.signup);
 router.post("/login", checkSecretKey, userCtrl.login);
 router.post("/modify", checkSecretKey, auth, userCtrl.modify);
