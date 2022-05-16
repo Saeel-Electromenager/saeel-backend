@@ -2,11 +2,19 @@ const Product = require("../models/Product");
 const User = require("../models/User");
 
 exports.getProduct = (req, res, next) => {
-  Product.findAll({ include: "Category" })
-    .then((products) => {
-      res.status(200).json(products);
+  Product.findOne({
+    where: { idProduct: req.params.idProduct },
+    include: ["Category", "User"],
+  })
+    .then((product) => {
+      if (!product) {
+        return res.status(404).json({ error: "Produit introuvale" });
+      }
+      res.status(200).json(product.toJSON());
     })
-    .catch((error) => res.status(500).json({ error: "Error server" }));
+    .catch((error) => {
+      res.status(500).json({ error: "Error server" });
+    });
 };
 
 exports.addProduct = (req, res, next) => {

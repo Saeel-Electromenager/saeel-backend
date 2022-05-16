@@ -215,7 +215,7 @@ exports.confirmeEmail = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-  User.findOne()
+  User.findOne({ where: { idUser: req.auth.idUser } })
     .then((admin) => {
       if (admin.type === 3)
         User.findAll()
@@ -229,15 +229,29 @@ exports.getAllUsers = (req, res, next) => {
 exports.getUser = (req, res, next) => {
   if (req.params.idUser !== req.auth.idUser)
     res.status(401).json({ error: "Non autorisé" });
+  const Adress = require("../models/Adress");
+  const Product = require("../models/Product");
+  const Category = require("../models/Category");
+
   User.findOne({
     where: { idUser: req.params.idUser },
-    include: ["Adresses", "Products"],
+    include: [
+      {
+        model: Adress,
+      },
+      {
+        model: Product,
+        include: {
+          model: Category,
+        },
+      },
+    ],
   })
     .then((user) => {
       user = user.toJSON();
       delete user.password;
-      delete confirmEmailCode;
-      delete resetCode;
+      delete user.confirmEmailCode;
+      delete user.resetCode;
       res.status(200).json(user);
     })
     .catch((error) => {

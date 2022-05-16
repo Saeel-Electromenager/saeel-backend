@@ -60,7 +60,13 @@ const productSchema = {
   title: {
     type: DataTypes.VIRTUAL,
     get() {
-      return `${this.Category.name} ${this.brand} ${this.model}`;
+      let categoryName = "";
+      try {
+        categoryName = this.Category.name;
+      } catch (error) {
+        console.log("Pas de category");
+      }
+      return `${categoryName} ${this.brand} ${this.model}`;
     },
   },
 };

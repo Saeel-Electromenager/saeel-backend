@@ -5,6 +5,7 @@ const categoryRoutes = require("./routes/category");
 const userRoutes = require("./routes/user");
 const adressRoutes = require("./routes/adress");
 const productRoutes = require("./routes/product");
+const orderRoutes = require("./routes/order");
 
 const app = express();
 app.use(express.json());
@@ -33,20 +34,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/adress", adressRoutes);
 app.use("/api/product", productRoutes);
-app.put("/api/user1/:idUser", (req, res, next) => {
-  console.log(req.params);
-  res.status(200).json({
-    nom: "sidali",
-    prenom: "mouhous",
-    naissance: "25/10/2000",
-    pseudo: "sidou06",
-    poste: 6000,
-    email: "sidallimouhous9@gmail.com",
-    wilaya: "bejaia",
-    commune: "ouedghir",
-    village: "Mellala",
-    rue: "pour bien precicer lendroit ",
-  });
-});
+app.use("/api/order", orderRoutes);
 
 module.exports = app;
