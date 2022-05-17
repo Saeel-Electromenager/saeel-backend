@@ -1,3 +1,6 @@
+const CacheService = require("../configurations/cache.service");
+const NodeCache = require("node-cache");
+const { Op } = require("sequelize");
 const Product = require("../models/Product");
 const User = require("../models/User");
 
@@ -38,9 +41,30 @@ exports.addProduct = (req, res, next) => {
     .catch((error) => res.status(500).json({ error: "Error server" }));
 };
 
-exports.modifyProduct = (req, res, next) => {
-  Product.update({});
+exports.bestSaeel = (req, res, next) => {
+  const ttl = 60 * 60 * 24; // cache for 24 Hour
+  const cache = new CacheService(ttl); // Create a new cache service instance
+  const value = cache.get("cache-best-saeel");
+  if (value) return res.status(200).json(value);
+
+  Product.findAll({
+    where: {
+      discount: {
+        [Op.gt]: 10,
+      },
+    },
+  })
+    .then((products) => {
+      cache.set("cache-best-saeel", products);
+      res.status(201).json(products);
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "Erreur server1" });
+    });
 };
+
+exports.modifyProduct = (req, res, next) => {};
 
 exports.deleteProduct = (req, res, next) => {
   // TODO

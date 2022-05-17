@@ -214,6 +214,52 @@ exports.confirmeEmail = (req, res, next) => {
     });
 };
 
+exports.getProviders = (req, res, next) => {
+  User.findAll({
+    where: { type: 1 },
+    attributes: [
+      "idUser",
+      "username",
+      "firstname",
+      "lastname",
+      "email",
+      "image",
+      "birthdate",
+      "type",
+      "status",
+      "createdAt",
+      "updatedAt",
+    ],
+  })
+    .then((providers) => {
+      res.status(200).json(providers);
+    })
+    .catch(() => res.status(500).json({ error: "Erreur server" }));
+};
+
+exports.getModerators = (req, res, next) => {
+  User.findAll({
+    where: { type: 2 },
+    attributes: [
+      "idUser",
+      "username",
+      "firstname",
+      "lastname",
+      "email",
+      "image",
+      "birthdate",
+      "type",
+      "status",
+      "createdAt",
+      "updatedAt",
+    ],
+  })
+    .then((moderators) => {
+      res.status(200).json(moderators);
+    })
+    .catch(() => res.status(500).json({ error: "Erreur server" }));
+};
+
 exports.getAllUsers = (req, res, next) => {
   User.findOne({ where: { idUser: req.auth.idUser } })
     .then((admin) => {
@@ -227,7 +273,7 @@ exports.getAllUsers = (req, res, next) => {
 };
 
 exports.getUser = (req, res, next) => {
-  if (req.params.idUser !== req.auth.idUser)
+  if (req.auth.idUser < 2 && req.params.idUser !== req.auth.idUser)
     res.status(401).json({ error: "Non autorisé" });
   const Adress = require("../models/Adress");
   const Product = require("../models/Product");

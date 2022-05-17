@@ -1,4 +1,4 @@
-import NodeCache from "node-cache";
+const NodeCache = require("node-cache");
 
 class Cache {
   constructor(ttlSeconds) {
@@ -9,16 +9,32 @@ class Cache {
     });
   }
 
-  get(key, storeFunction) {
+  get(key) {
     const value = this.cache.get(key);
-    if (value) {
-      return Promise.resolve(value);
-    }
+    console.log("value :");
+    console.log(value);
 
-    return storeFunction().then((result) => {
-      this.cache.set(key, result);
-      return result;
-    });
+    const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
+    const obj = { my: "Special1", variable: 422 };
+
+    const success = myCache.set("myKey", obj);
+    console.log(success);
+    const success1 = myCache.get("myKey");
+    console.log(success1);
+    if (value) {
+      console.log("is in cache");
+      return Promise.resolve(value);
+    } else return false;
+
+    // return storeFunction().then((result) => {
+    //   console.log(result);
+    //   this.cache.set(key, result);
+    //   return result;
+    // });
+  }
+
+  set(key, value) {
+    this.cache.set(key, value);
   }
 
   del(keys) {
@@ -43,4 +59,4 @@ class Cache {
   }
 }
 
-export default Cache;
+module.exports = Cache;
