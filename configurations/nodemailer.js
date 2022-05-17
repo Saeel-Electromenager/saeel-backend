@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 const mailContent = (content) => {
   return {
-    from: "Saeel Électroménager <saeel.electromenager@outlook.fr>",
+    from: "saeel.electromenager@outlook.fr",
     to: content.toEmail,
     subject: content.subject,
     text: content.text,
