@@ -273,59 +273,63 @@ exports.getAllUsers = (req, res, next) => {
 };
 
 exports.getUser = (req, res, next) => {
-  if (req.auth.idUser < 2 && req.params.idUser !== req.auth.idUser)
-    res.status(401).json({ error: "Non autorisé" });
-  const Adress = require("../models/Adress");
-  const Product = require("../models/Product");
-  const Category = require("../models/Category");
+  User.findOne({ where: { idUser: req.auth.idUser } })
+    .then((admin) => {
+      if (!admin) res.status(401).json({ error: "Non autorisé" });
+      if (admin.type < 2 && req.params.idUser !== req.auth.idUser)
+        return res.status(401).json({ error: "Non autorisé" });
 
-  User.findOne({
-    where: { idUser: req.params.idUser },
-    include: [
-      {
-        model: Adress,
-      },
-      {
-        model: Product,
-        include: {
-          model: Category,
-        },
-      },
-    ],
-  })
-    .then((user) => {
-      user = user.toJSON();
-      delete user.password;
-      delete user.confirmEmailCode;
-      delete user.resetCode;
-      res.status(200).json(user);
+      // tout est ok
+      const Adress = require("../models/Adress");
+      const Product = require("../models/Product");
+      const Category = require("../models/Category");
+
+      User.findOne({
+        where: { idUser: req.params.idUser },
+        include: [
+          {
+            model: Adress,
+          },
+          {
+            model: Product,
+            include: {
+              model: Category,
+            },
+          },
+        ],
+      })
+        .then((user) => {
+          if (user) {
+            user = user.toJSON();
+            delete user.password;
+            delete user.confirmEmailCode;
+            delete user.resetCode;
+            return res.status(200).json(user);
+          }
+          return res.status(404).json({ error: "Utilisateur introuvable" });
+        })
+        .catch((error) => {
+          console.log(error);
+          res.status(500).json({ error: "error server" });
+        });
     })
-    .catch((error) => {
-      console.log(error);
-      res.status(500).json({ error: "error server" });
-    });
+    .catch(() => res.status(500).json({ error: "error server" }));
 };
 
 exports.upgradeUser = (req, res, next) => {
-  const newStatus = req.body.newStatus;
-  if (![0, 1, 2].includes(newStatus))
+  console.log("eeeee");
+  const type = req.body.type;
+  if (![0, 1, 2].includes(type))
     return res.status(400).json({ error: "erreur" });
-  User.findOne(req.auth.idUser)
-    .then((admin) => {
-      if (admin && admin.status === 3) {
-        User.findOne({ where: { idUser: req.body.user.idUser } })
-          .then((user) => {
-            user
-              .update({ status: newStatus })
-              .then(() =>
-                res
-                  .status(200)
-                  .json({ message: "Utilisateur modifier avec succès" })
-              )
-              .catch(() => res.status(500).json({ error: "erreur serveur" }));
-          })
-          .catch(() => res.status(500).json({ error: "Error server" }));
-      } else res.status(400).json({ error: "t'es pas un admin ?" });
+  User.findOne({ where: { idUser: req.params.idUser } })
+    .then((user) => {
+      if (!user) return res.status(404).json({ error: "user not found" });
+      user
+        .update({ status: type })
+        .then(() =>
+          res.status(200).json({ message: "Utilisateur modifier avec succès" })
+        )
+        .catch(() => res.status(500).json({ error: "erreur serveur" }));
     })
     .catch(() => res.status(500).json({ error: "Error server" }));
 };

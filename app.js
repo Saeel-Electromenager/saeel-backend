@@ -36,4 +36,29 @@ app.use("/api/adress", adressRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
 
+app.get("/api/test/", (req, res, next) => {
+  const Category = require("./models/Category");
+  const Product = require("./models/Product");
+  const sequelize = require("./configurations/Sequelize");
+  Category.findAll({
+    attributes: [
+      // [sequelize.fn("COUNT", sequelize.col("idProduct")), "n_hats"],
+      "name",
+      [
+        sequelize.literal(
+          "(SELECT COUNT(*) FROM Products WHERE Products.idProduct = Category.idCategory)"
+        ),
+        "numberOfProduct",
+      ],
+    ],
+    group: "idCategory",
+    order: [[sequelize.literal("numberOfProduct"), "DESC"]],
+  })
+    .then((data) => res.status(200).json(data))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: "error" });
+    });
+});
+
 module.exports = app;

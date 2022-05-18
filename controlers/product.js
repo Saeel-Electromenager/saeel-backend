@@ -3,6 +3,7 @@ const NodeCache = require("node-cache");
 const { Op } = require("sequelize");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const Image = require("../models/Image");
 
 exports.getProduct = (req, res, next) => {
   Product.findOne({
@@ -23,7 +24,7 @@ exports.getProduct = (req, res, next) => {
 exports.addProduct = (req, res, next) => {
   User.findOne({ where: { idUser: req.auth.idUser } })
     .then((user) => {
-      if (!user || user.type !== 2)
+      if (!user || user.type !== 1)
         return res
           .status(400)
           .json({ error: "Vous n'êtes pas autorisé a ajouter des produit" });
@@ -31,14 +32,26 @@ exports.addProduct = (req, res, next) => {
         ...req.body,
         idProvider: req.auth.idUser,
       })
-        .then(() =>
-          res.status(201).json({ message: "Produit ajouté avec succès" })
+        .then((product) =>
+          Image.create({
+            idProduct: product.idProduct,
+            url: req.body.url,
+          })
+            .then(() =>
+              res.status(201).json({ message: "Produit ajouté avec succès" })
+            )
+            .catch((error) =>
+              res.status(500).json({
+                error: "Article ajouté, image a subit une erreur server",
+              })
+            )
         )
         .catch((error) => {
+          console.log(error);
           res.status(500).json({ error: "Error server" });
         });
     })
-    .catch((error) => res.status(500).json({ error: "Error server" }));
+    .catch((error) => res.status(500).json({ error: "Error server1" }));
 };
 
 exports.bestSaeel = (req, res, next) => {
@@ -72,4 +85,47 @@ exports.deleteProduct = (req, res, next) => {
 
 exports.topSales = (req, res, next) => {};
 
-exports.topRated = (req, res, next) => {};
+exports.topRated = (req, res, next) => {
+  // TODO ORDER
+  Product.findAll({ limit: 6, include: ["Category", "Images"] })
+    .then((products) => res.status(200).json(products))
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error: "erreru server" });
+    });
+};
+
+exports.searchProducts = (req, res, next) => {
+  const likeSearchKey = `%${req.params.searchKey}%`;
+  const idCategory = parseInt(req.params.idCategory);
+  // TODO:
+  // const searchKey = req.params.searchKey.split(" ");
+  // let whereAr = {};
+  // for (const s of searchKey) {}
+
+  let where = {
+    [Op.or]: [
+      {
+        brand: {
+          [Op.like]: likeSearchKey,
+        },
+      },
+      {
+        model: {
+          [Op.like]: likeSearchKey,
+        },
+      },
+      {
+        description: {
+          [Op.like]: likeSearchKey,
+        },
+      },
+    ],
+  };
+  if (!!idCategory) where = { ...where, idCategory: idCategory };
+  console.log(!!idCategory);
+  console.log(where);
+  Product.findAll({ where: where })
+    .then((products) => res.status(200).json(products))
+    .catch(() => res.status(500).json({ error: "error" }));
+};
