@@ -5,10 +5,12 @@ const auth = require("../middleware/auth");
 const checkSecretKey = require("../middleware/check_secret_key");
 const productCtrl = require("../controlers/product");
 
-router.get("/", productCtrl.getProduct);
-router.put("/:idProduct", productCtrl.getProduct);
-router.get("/top-rated", productCtrl.topRated);
-router.get("/best-saeel", productCtrl.bestSaeel);
+router.get("/", checkSecretKey, productCtrl.getProduct);
+router.put("/:idProduct", checkSecretKey, productCtrl.getProduct);
+router.get("/top-rated", checkSecretKey, productCtrl.topRated);
+router.put("/new-product/:idProvider", checkSecretKey, productCtrl.newProducts);
+router.get("/provider-products", checkSecretKey, productCtrl.topRated);
+router.get("/best-saeel", checkSecretKey, productCtrl.bestSaeel);
 router.post("/add", checkSecretKey, auth, productCtrl.addProduct);
 router.post("/modify", checkSecretKey, auth, productCtrl.modifyProduct);
 router.put("/delete/:id", checkSecretKey, auth, productCtrl.deleteProduct);

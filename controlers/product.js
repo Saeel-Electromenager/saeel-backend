@@ -96,7 +96,10 @@ exports.topRated = (req, res, next) => {
 };
 
 exports.searchProducts = (req, res, next) => {
-  const likeSearchKey = `%${req.params.searchKey}%`;
+  searchKey = req.params.searchKey;
+  if (req.params.searchKey === "allOfSaeel") searchKey = "";
+  const likeSearchKey = `%${searchKey}%`;
+
   const idCategory = parseInt(req.params.idCategory);
   // TODO:
   // const searchKey = req.params.searchKey.split(" ");
@@ -107,7 +110,7 @@ exports.searchProducts = (req, res, next) => {
     [Op.or]: [
       {
         brand: {
-          [Op.like]: likeSearchKey,
+          [Op.like]: "likeSearchKey",
         },
       },
       {
@@ -125,7 +128,30 @@ exports.searchProducts = (req, res, next) => {
   if (!!idCategory) where = { ...where, idCategory: idCategory };
   console.log(!!idCategory);
   console.log(where);
-  Product.findAll({ where: where })
+  Product.findAll({ where: where, include: ["Category", "Images"], limit: 100 })
     .then((products) => res.status(200).json(products))
     .catch(() => res.status(500).json({ error: "error" }));
+};
+
+exports.newProducts = (req, res, next) => {
+  Product.findAll({ limit: 100, order: [["createdAt", "DESC"]] })
+    .then((products) => res.status(200).json(products))
+    .catch((error) => {
+      res.status(500).json({ error: "error server" });
+      console.log(error);
+    });
+};
+
+exports.providerProducts = (req, res, next) => {
+  User.findOne({ where: { idUser: req.auth.idUser } })
+    .then((provider) => {
+      if (provider.type < 1)
+        return res.status(400).json({ message: "Vous n'étais pas autorisé" });
+      Product.findAll({ where: { idProvider: req.params.idUser } })
+        .then((products) => res.status(200).json(products))
+        .catch((error) => res.status(500).json({ error: "error server" }));
+    })
+    .catch((error) => {
+      res.status(500).json({ error: "error server" });
+    });
 };

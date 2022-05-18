@@ -317,7 +317,6 @@ exports.getUser = (req, res, next) => {
 };
 
 exports.upgradeUser = (req, res, next) => {
-  console.log("eeeee");
   const type = req.body.type;
   if (![0, 1, 2].includes(type))
     return res.status(400).json({ error: "erreur" });
@@ -325,7 +324,7 @@ exports.upgradeUser = (req, res, next) => {
     .then((user) => {
       if (!user) return res.status(404).json({ error: "user not found" });
       user
-        .update({ status: type })
+        .update({ type: type })
         .then(() =>
           res.status(200).json({ message: "Utilisateur modifier avec succès" })
         )
