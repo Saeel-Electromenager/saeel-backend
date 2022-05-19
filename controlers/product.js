@@ -8,7 +8,7 @@ const Image = require("../models/Image");
 exports.getProduct = (req, res, next) => {
   Product.findOne({
     where: { idProduct: req.params.idProduct },
-    include: ["Category", "User"],
+    include: ["Category", "User", "Images"],
   })
     .then((product) => {
       if (!product) {
@@ -83,9 +83,8 @@ exports.deleteProduct = (req, res, next) => {
   // TODO
 };
 
-exports.topSales = (req, res, next) => {};
-
-exports.topRated = (req, res, next) => {
+exports.topSaeel = (req, res, next) => {
+  console.log("test");
   // TODO ORDER
   Product.findAll({ limit: 6, include: ["Category", "Images"] })
     .then((products) => res.status(200).json(products))
@@ -147,7 +146,7 @@ exports.providerProducts = (req, res, next) => {
     .then((provider) => {
       if (provider.type < 1)
         return res.status(400).json({ message: "Vous n'étais pas autorisé" });
-      Product.findAll({ where: { idProvider: req.params.idUser } })
+      Product.findAll({ where: { idProvider: req.params.idProvider } })
         .then((products) => res.status(200).json(products))
         .catch((error) => res.status(500).json({ error: "error server" }));
     })

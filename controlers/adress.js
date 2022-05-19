@@ -48,3 +48,15 @@ exports.deleteAdress = (req, res, next) => {
     })
     .catch(() => res.status(500).json({ error: "Erreur server" }));
 };
+
+exports.getAdress = (req, res, next) => {
+  Adress.findAll({ where: { idUser: req.auth.idUser } })
+    .then((adresses) => {
+      if (adresses.length < 1)
+        return res.status(404).json({ error: "Aucune adresse trouvé" });
+      return res.status(200).json(adresses);
+    })
+    .catch((error) => {
+      res.status(500).json({ error: "error server" });
+    });
+};
