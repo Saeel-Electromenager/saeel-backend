@@ -6,9 +6,13 @@ const SAEEL_EMAIL_PASSWORD = process.env.SAEEL_EMAIL_PASSWORD;
 
 const transporter = nodemailer.createTransport({
   service: "hotmail",
+  secure: false,
   auth: {
     user: SAEEL_EMAIL,
     pass: SAEEL_EMAIL_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
