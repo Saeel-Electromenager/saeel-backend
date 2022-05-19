@@ -283,12 +283,19 @@ exports.getUser = (req, res, next) => {
       const Adress = require("../models/Adress");
       const Product = require("../models/Product");
       const Category = require("../models/Category");
+      const Order = require("../models/Order");
 
       User.findOne({
         where: { idUser: req.params.idUser },
         include: [
           {
             model: Adress,
+          },
+          {
+            model: Order,
+            include: {
+              model: Product,
+            },
           },
           {
             model: Product,

@@ -54,11 +54,6 @@ const orderSchema = {
       isIn: [[0, 1, 2]], // ["Waiting for payment", "In delivering", "Delivered"]
     },
   },
-  date: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
-    defaultValue: sequelize.NOW,
-  },
 };
 
 const Order = sequelize.define("Order", orderSchema);

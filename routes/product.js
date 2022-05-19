@@ -7,10 +7,11 @@ const productCtrl = require("../controlers/product");
 
 router.get("/", checkSecretKey, productCtrl.getProduct);
 router.put("/:idProduct", checkSecretKey, productCtrl.getProduct);
-router.get("/new-products", checkSecretKey, productCtrl.newProducts);
+router.get("/new-products", checkSecretKey, auth, productCtrl.newProducts);
 router.put(
   "/provider-products/:idProvider",
   checkSecretKey,
+  auth,
   productCtrl.providerProducts
 );
 router.get("/top-saeel", checkSecretKey, productCtrl.topSaeel);
