@@ -6,6 +6,7 @@ const userRoutes = require("./routes/user");
 const adressRoutes = require("./routes/adress");
 const productRoutes = require("./routes/product");
 const orderRoutes = require("./routes/order");
+const favoriteRoutes = require("./routes/favorite");
 
 const app = express();
 app.use(express.json());
@@ -35,6 +36,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/adress", adressRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/favorite", favoriteRoutes);
 
 app.get("/api/test/", (req, res, next) => {
   const Category = require("./models/Category");

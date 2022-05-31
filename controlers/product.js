@@ -4,6 +4,7 @@ const { Op } = require("sequelize");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const Image = require("../models/Image");
+// const NodeCache = require("node-cache");
 
 exports.getProduct = (req, res, next) => {
   Product.findOne({
@@ -86,6 +87,8 @@ exports.deleteProduct = (req, res, next) => {
 exports.topSaeel = (req, res, next) => {
   console.log("test");
   // TODO ORDER
+  // const topSaeel = NodeCache.get('top-saeel');
+  // if()
   Product.findAll({ limit: 6, include: ["Category", "Images"] })
     .then((products) => res.status(200).json(products))
     .catch((error) => {
@@ -98,6 +101,7 @@ exports.searchProducts = (req, res, next) => {
   searchKey = req.params.searchKey;
   if (req.params.searchKey === "allOfSaeel") searchKey = "";
   const likeSearchKey = `%${searchKey}%`;
+  console.log(likeSearchKey);
 
   const idCategory = parseInt(req.params.idCategory);
   // TODO:
@@ -109,7 +113,7 @@ exports.searchProducts = (req, res, next) => {
     [Op.or]: [
       {
         brand: {
-          [Op.like]: "likeSearchKey",
+          [Op.like]: likeSearchKey,
         },
       },
       {

@@ -3,6 +3,7 @@ let separator = "é&=6=)";
 
 module.exports = (req, res, next) => {
   try {
+    console.log(req.headers.authorization2);
     const timeNow = new Date().getTime();
     let secretMessage = req.headers.authorization2;
     secretMessage = decryptMessage(secretMessage).split(separator);

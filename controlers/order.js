@@ -40,8 +40,8 @@ exports.addOrder = (req, res, next) => {
         quandtity: req.body.qtty,
       };
       Order.create(newOrder)
-        .then(() => {
-          res.status(200).json({ message: "Commande effectuer avec succès" });
+        .then((order) => {
+          res.status(200).json(order);
         })
         .catch((error) => {
           console.log(error);
