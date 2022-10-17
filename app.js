@@ -7,6 +7,7 @@ const adressRoutes = require("./routes/adress");
 const productRoutes = require("./routes/product");
 const orderRoutes = require("./routes/order");
 const favoriteRoutes = require("./routes/favorite");
+const User = require("./models/User");
 
 const app = express();
 app.use(express.json());
@@ -38,29 +39,15 @@ app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/favorite", favoriteRoutes);
 
-app.get("/api/test/", (req, res, next) => {
-  const Category = require("./models/Category");
-  const Product = require("./models/Product");
-  const sequelize = require("./configurations/Sequelize");
-  Category.findAll({
-    attributes: [
-      // [sequelize.fn("COUNT", sequelize.col("idProduct")), "n_hats"],
-      "name",
-      [
-        sequelize.literal(
-          "(SELECT COUNT(*) FROM Products WHERE Products.idProduct = Category.idCategory)"
-        ),
-        "numberOfProduct",
-      ],
-    ],
-    group: "idCategory",
-    order: [[sequelize.literal("numberOfProduct"), "DESC"]],
-  })
-    .then((data) => res.status(200).json(data))
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: "error" });
-    });
+app.post("/api/test/", async (req, res, next) => {
+  const data = req.body;
+  try {
+    data.password = await bycript.hash(data.password, 10);
+    await User.create(data);
+    res.status(200).json({ message: "OK" });
+  } catch (error) {
+    res.status(500).json({ error: "error" });
+  }
 });
 
 module.exports = app;
